@@ -1,16 +1,14 @@
 'use client'
 
+import Link from "next/link"
+import { signOut } from "next-auth/react"
+
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { signOut } from "next-auth/react"
-import Link from "next/link"
+import { SafeUser } from "@/types/types"
 
 interface AvatarDropdownProps {
-  user: {
-    email: string
-    image: string | null
-    name: string
-  } | null
+  user: SafeUser
 }
 
 const AvatarDropdown= ({
@@ -22,7 +20,7 @@ const AvatarDropdown= ({
         <Avatar
           className='cursor-pointer'
         >
-          <AvatarImage src={`${user.image ? user.image : "/default-avatar.png"}`} />
+          <AvatarImage src={`${user.image}`} />
           <AvatarFallback></AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
@@ -30,7 +28,7 @@ const AvatarDropdown= ({
         align="end"
         className="w-36"
       >
-        <DropdownMenuLabel>{user?.name}</DropdownMenuLabel>
+        <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer"
@@ -40,7 +38,11 @@ const AvatarDropdown= ({
         <DropdownMenuItem
           className="cursor-pointer"
         >
-          <span>Mi cuenta</span>
+          <Link
+            href={`/${user.id}`}
+          >
+            Mi cuenta
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

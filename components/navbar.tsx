@@ -1,14 +1,13 @@
-'use client'
-
-import MainNav from "./main-nav"
-import AvatarDropdown from "./avatar-dropdown"
-import UploadModal from "./modals/upload-modal"
+import { Upload } from "lucide-react"
 import Link from "next/link"
-import { Button } from "./ui/button"
-import { useSession } from "next-auth/react"
 
-const Navbar = () => {
-  const { data } = useSession()
+import AvatarDropdown from "./avatar-dropdown"
+import MainNav from "./main-nav"
+import { Button } from "./ui/button"
+import getCurrentUser from "@/actions/get-current-user"
+
+const Navbar = async () => {
+  const user = await getCurrentUser()
   return (
     <header
       className="fixed top-0 w-full h-16 border-b-2 border-gray-100 bg-white flex items-center z-50"
@@ -31,12 +30,20 @@ const Navbar = () => {
           className="flex flex-row space-x-4"
         >
           {
-            data ? (
+            user ? (
               <>
                 <AvatarDropdown
-                  user={data.user}
+                  user={user}
                 />
-                <UploadModal />
+                <Button
+                  asChild
+                >
+                  <Link
+                    href={`/${user.id}/post/subir`}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />Subir
+                  </Link>
+                </Button>
               </>
             ) :
               (

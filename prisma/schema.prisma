@@ -9,16 +9,21 @@ datasource db {
 
 model User {
   id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  name           String?
+  name           String
   email          String?   @unique
   emailVerified  DateTime?
-  image          String?
+  image          String    @default("/default-avatar.png")
   hashedPassword String?
+  description    String    @default("Bienvenidos a mi perfil!")
+  contact        String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+  favoritesId    String[]  @default([])
+  likesId        String[]  @default([])
+  role           Role      @default(USER)
 
   accounts Account[]
-  Post     Post[]
+  posts    Post[]
 }
 
 model Account {
@@ -41,25 +46,32 @@ model Account {
 }
 
 model Post {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String     @db.ObjectId
   title       String
   description String
-  // image       String
+  image       String
   web         String
-  repo        String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  // categories  Category[]
+  repo        String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  likes       Int        @default(0)
+  categories  Category[]
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// model Category {
-//   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-//   name      String
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-//   Post      Post?    @relation(fields: [postId], references: [id])
-//   postId    String?  @db.ObjectId
-// }
+model Category {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String   @db.ObjectId
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  posts Post @relation(fields: [postId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
+}

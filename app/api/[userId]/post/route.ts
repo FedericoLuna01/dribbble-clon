@@ -1,34 +1,32 @@
 import { NextResponse } from "next/server";
 import prismadb from "@/lib/prismadb";
+import getCurrentUser from "@/actions/get-current-user";
 
 export async function POST(req: Request) {
   const body = await req.json()
-  const { title, description, web, repo } = body
+  const { title, description, web, repo, imageUrl } = body
 
-  const session = 
+  const user = await getCurrentUser()
+
+  if (!user) {
+    return new NextResponse('Unauthorized', { status: 401 })
+  }
 
   try {
     const post = await prismadb.post.create({
       data: {
         title,
         description,
+        image: imageUrl,
         web,
-        repo
+        repo,
+        userId: user.id
       }
     })
+
     return NextResponse.json(post)
   } catch (error) {
     console.log(error)
     return new NextResponse('error', { status: 500 })
   }
 }
-
-// export async function GET(req: Request) {
-//   try {
-//     const posts = await prismadb.post.findMany()
-//     return NextResponse.json(posts)
-//   } catch (error) {
-//     console.log(error)
-//     return new NextResponse('error', { status: 500 })
-//   }
-// }

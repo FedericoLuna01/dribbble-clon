@@ -42,7 +42,7 @@ const RegisterForm = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const user = await axios.post('/api/register', values)
+      await axios.post('/api/register', values)
         .then(() => {
           toast.success('Usuario creado correctamente');
 
@@ -64,7 +64,6 @@ const RegisterForm = () => {
               }
 
             })
-          console.log(user)
         })
         .catch((error) => {
           console.log(error)
