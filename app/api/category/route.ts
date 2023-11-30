@@ -8,14 +8,14 @@ export async function POST (req: Request, res: Response) {
   try {
     const category = await prismadb.category.create({
       data: {
-        name
+        name,
       }
     })
+
+    return NextResponse.json(category)
 
   } catch (error) {
     console.log(error)
     return new NextResponse('Algo salio mal', { status: 500 })
   }
-
-
 }

@@ -9,6 +9,8 @@ import { Button } from "./button"
 import { PostAndUser, SafeUser } from "@/types/types"
 import { useState } from "react"
 import PostOptionsDropdown from "../post-options-dropdown"
+import axios from "axios"
+import { useRouter } from "next/navigation"
 
 interface PostCardProps {
   withAuthor?: boolean
@@ -21,14 +23,44 @@ const PostCard: React.FC<PostCardProps> = ({
   post,
   currentUser
 }) => {
-  const [isLiked, setIsLiked] = useState(false)
-  const [isSaved, setIsSaved] = useState(false)
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
   const isOwn = currentUser?.id === post.userId
+  const isSaved = currentUser?.favoritesId.includes(post.id)
+  const isLiked = currentUser?.likesId.includes(post.id)
+
+  const handleSave = async () => {
+    if(!currentUser) return router.push('/ingreso')
+
+    setIsLoading(true)
+    const data = {
+      postId: post.id
+    }
+    const res = await axios.patch(`/api/${currentUser?.id}/favorites`, data)
+    if (res.status === 200) {
+      router.refresh()
+    }
+
+    setIsLoading(false)
+  }
+
+  const handleLike = async () => {
+    if(!currentUser) return router.push('/ingreso')
+
+    setIsLoading(true)
+
+    const res = await axios.patch(`/api/${currentUser?.id}/post/${post.id}/like`)
+    if (res.status === 200) {
+      router.refresh()
+    }
+
+    setIsLoading(false)
+  }
 
   return (
     <article
-      className="relative"
+      className="relative max-w-md"
     >
       <div
         className="group relative"
@@ -43,16 +75,17 @@ const PostCard: React.FC<PostCardProps> = ({
               <Button
                 className={`absolute top-3 right-3 z-30 opacity-0 group-hover:opacity-100
               duration-200 transition-all
-              ${isLiked ? 'opacity-100' : 'opacity-0'}
+              ${isSaved ? 'opacity-100' : 'opacity-0'}
               `}
                 size='sm'
-                onClick={() => (setIsLiked(!isLiked))}
+                onClick={handleSave}
+                disabled={isLoading}
               >
-                {isLiked ? 'Guardado' : 'Guardar'}
+                {isSaved ? 'Guardado' : 'Guardar'}
                 <Bookmark
                   className='w-5 h-5 ml-2'
-                  color={isLiked ? '#2cff95' : '#FFFFFF'}
-                  fill={isLiked ? "#2cff95" : "#FFFFFF"}
+                  color={isSaved ? '#2cff95' : '#FFFFFF'}
+                  fill={isSaved ? "#2cff95" : "#FFFFFF"}
                 />
               </Button>
             )
@@ -100,10 +133,11 @@ const PostCard: React.FC<PostCardProps> = ({
             >
               <Heart
                 className="w-4 h-4 mr-1 cursor-pointer"
-                color={isSaved ? '#F00' : '#D1D1CD'}
-                fill={isSaved ? "#F00" : "#D1D1CD"}
-                onClick={() => setIsSaved(!isSaved)}
-              /> 456
+                color={isLiked ? '#F00' : '#D1D1CD'}
+                fill={isLiked ? "#F00" : "#D1D1CD"}
+                onClick={handleLike}
+              />
+              {post.likes}
             </div>
           </div>
           : null

@@ -1,25 +1,19 @@
 import getCurrentUser from "@/actions/get-current-user"
 import PostCard from "./ui/post-card"
-import prismadb from "@/lib/prismadb"
+import { PostAndUser } from "@/types/types"
 
-const PostsGrid = async () => {
-  const posts = await prismadb.post.findMany({
-    include: {
-      user: {
-        select: {
-          name: true,
-          image: true,
-        }
-      }
-    }
-  })
+interface PostsGridProps {
+  posts: PostAndUser[]
+}
+
+const PostsGrid: React.FC<PostsGridProps> = async ({ posts }) => {
   const user = await getCurrentUser()
   return (
     <section
-      className="my-10 grid gap-5 gap-y-12 grid-cols-[repeat(auto-fit,minmax(320px,1fr))]"
+      className="my-10 grid gap-5 gap-y-12 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
     >
       {
-        posts ? posts.map((post) => (
+        posts?.length !== 0 ? posts.map((post) => (
           <PostCard
             key={post.id}
             post={post}
@@ -28,12 +22,12 @@ const PostsGrid = async () => {
         ))
           :
           <div
-            className="flex justify-center items-center mt-32 text-black"
+            className="min-h-[60vh]"
           >
             <p
-              className="text-2xl font-semibold"
+              className="text-2xl text-gray-600"
             >
-            No posts found
+              No se encontraron posts :(
             </p>
           </div>
       }

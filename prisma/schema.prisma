@@ -46,29 +46,28 @@ model Account {
 }
 
 model Post {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String     @db.ObjectId
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
   title       String
   description String
   image       String
   web         String
-  repo        String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  likes       Int        @default(0)
-  categories  Category[]
+  repo        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  likes       Int      @default(0)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String   @db.ObjectId
 }
 
 model Category {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  postId    String   @db.ObjectId
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  posts Post @relation(fields: [postId], references: [id])
+  posts     Post[]
 }
 
 enum Role {

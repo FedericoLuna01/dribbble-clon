@@ -1,30 +1,24 @@
-import Image from "next/image"
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import prismadb from "@/lib/prismadb"
 import PersonalPostsGrid from "./components/personal-posts-grid"
 
-const ProfilePage = async ({ params }: { params: { usedId: string } }) => {
+const ProfilePage = async ({ params }: { params: { userId: string } }) => {
   const account = await prismadb.user.findUnique({
     where: {
-      id: params.usedId
+      id: params.userId
     },
     include: {
       posts: true
     }
   })
+
+  if(!account) return null
+
   return (
     <section
-      className="container mt-20"
+      className="container mt-24"
     >
       {
         account ? (
@@ -35,9 +29,8 @@ const ProfilePage = async ({ params }: { params: { usedId: string } }) => {
               <div
                 className="space-y-4"
               >
-                <Avatar className="w-20 h-20">
+                <Avatar className="w-44 h-44">
                   <AvatarImage src={account.image} />
-                  <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
                 <div>
                   <h1 className="text-4xl font-bold">{account.name}</h1>
@@ -47,20 +40,11 @@ const ProfilePage = async ({ params }: { params: { usedId: string } }) => {
                   Contacto
                 </Button>
               </div>
-              <div>
-                <Image
-                  src='/demo.png'
-                  width={600}
-                  height={300}
-                  alt='demo'
-                  className="aspect-[16/11] object-cover rounded-xl shadow-sm"
-                />
-              </div>
             </div>
             <div
               className="mt-10"
             >
-              <Select>
+              {/* <Select>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Filtrar por..." />
                 </SelectTrigger>
@@ -70,7 +54,7 @@ const ProfilePage = async ({ params }: { params: { usedId: string } }) => {
                   <SelectItem value="dark">Mas recientes</SelectItem>
                   <SelectItem value="system">Mas antiguos</SelectItem>
                 </SelectContent>
-              </Select>
+              </Select> */}
               <Separator className="my-2" />
               <PersonalPostsGrid
                 posts={account.posts}

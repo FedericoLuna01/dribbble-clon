@@ -30,7 +30,7 @@ export async function PATCH(req: Request,
   { params }: { params: { userId: string, postId: string }}
 ) {
   const body = await req.json()
-  const { title, description, web, repo, imageUrl } = body
+  const { title, description, web, repo, imageUrl, categoryId } = body
 
   const user = await getCurrentUser()
 
@@ -52,7 +52,8 @@ export async function PATCH(req: Request,
         description,
         image: imageUrl,
         web,
-        repo
+        repo,
+        categoryId
       }
     })
     return NextResponse.json(post)

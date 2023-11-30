@@ -4,7 +4,7 @@ import getCurrentUser from "@/actions/get-current-user";
 
 export async function POST(req: Request) {
   const body = await req.json()
-  const { title, description, web, repo, imageUrl } = body
+  const { title, description, web, repo, imageUrl, categoryId } = body
 
   const user = await getCurrentUser()
 
@@ -20,6 +20,7 @@ export async function POST(req: Request) {
         image: imageUrl,
         web,
         repo,
+        categoryId,
         userId: user.id
       }
     })

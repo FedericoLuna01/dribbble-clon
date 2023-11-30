@@ -1,15 +1,14 @@
 import Image from 'next/image'
-import { Bookmark, Heart } from 'lucide-react'
 
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import PostDescription from './components/post-description'
 import { Separator } from '@/components/ui/separator'
 import MorePosts from './components/more-posts'
 import prismadb from '@/lib/prismadb'
+import ActionsButtons from './components/actions-buttons'
+import getCurrentUser from '@/actions/get-current-user'
 
 const PostPage = async ({ params }: { params: { postId: string }}) => {
-  const isLiked = false
   const post = await prismadb.post.findUnique({
     where: {
       id: params.postId
@@ -23,6 +22,8 @@ const PostPage = async ({ params }: { params: { postId: string }}) => {
       }
     }
   })
+
+  const currentUser = await getCurrentUser()
 
   return (
     <section
@@ -62,20 +63,10 @@ const PostPage = async ({ params }: { params: { postId: string }}) => {
                     {post.user.name}
                   </h2>
                 </div>
-                <div
-                  className='space-x-4'
-                >
-                  <Button
-                    variant='secondary'
-                  >
-                    <Bookmark className='mr-2 w-4 h-4' />
-                Guardar
-                  </Button>
-                  <Button>
-                    <Heart className='mr-2 w-4 h-4' fill={isLiked ? '#f00' : 'transparent'} />
-                3453
-                  </Button>
-                </div>
+                <ActionsButtons
+                  post={post}
+                  currentUser={currentUser}
+                />
               </div>
               <PostDescription
                 post={post}

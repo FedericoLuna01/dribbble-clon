@@ -1,42 +1,40 @@
 'use client'
 
-import { useState } from "react"
-import { SlidersHorizontal } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import qs from 'query-string'
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import { Category } from "@prisma/client"
+import { Separator } from './ui/separator'
 
-const categories = [
-  {
-    label: 'Todas',
-    value: 'todas'
-  },
-  {
-    label: 'Animaciones',
-    value: 'animaciones'
-  },
-  {
-    label: 'Mobile',
-    value: 'mobile'
-  },
-  {
-    label: 'Web',
-    value: 'web'
-  },
-  {
-    label: 'Videojuegos',
-    value: 'videojuegos'
+interface FilterBarProps {
+  categories: Category[]
+}
+
+const FilterBar: React.FC<FilterBarProps> = ({ categories }) => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const selectedValue = searchParams.get('categoria')
+  const onClick = (name: string) => {
+    const current = qs.parse(searchParams.toString())
+
+    const query = {
+      ...current,
+      categoria: name || null
+    }
+
+    if (current.categoria === name) {
+      query.categoria = null
+    }
+
+    const url = qs.stringifyUrl({
+      url: window.location.href,
+      query
+    }, { skipNull: true })
+
+    router.push(url)
   }
-]
 
-const FilterBar = () => {
-  const [isSelected, setIsSelected] = useState('todas')
   return (
     <div
       className="mt-20"
@@ -48,24 +46,25 @@ const FilterBar = () => {
           className="space-x-4"
         >
           {
-            categories.map(({ value, label }) => (
+            categories.map(({ name, id }) => (
               <Button
-                key={value}
-                variant={isSelected === value ? 'secondary' : 'ghost'}
-                onClick={() => setIsSelected(value)}
+                key={id}
+                variant={selectedValue === name ? 'secondary' : 'ghost'}
+                onClick={() => onClick(name)}
               >
-                {label}
+                {name}
               </Button>
             ))
           }
         </div>
-        <Button
+        {/* <Button
           variant='outline'
-        >
+          >
           <SlidersHorizontal className="mr-4 w-4 h-4" /> Filtros
-        </Button>
+        </Button> */}
       </div>
-      <div
+      <Separator className='mt-4' />
+      {/* <div
         className="mt-4 flex flex-row items-center space-x-4"
       >
         <Select>
@@ -88,7 +87,7 @@ const FilterBar = () => {
             <SelectItem value="system">System</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
     </div>
   )
 }

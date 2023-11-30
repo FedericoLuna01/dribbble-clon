@@ -1,6 +1,8 @@
+import getCurrentUser from "@/actions/get-current-user"
 import { Button } from "@/components/ui/button"
 import PostCard from "@/components/ui/post-card"
 import prismadb from "@/lib/prismadb"
+import Link from "next/link"
 
 interface MorePostsProps {
   user: {
@@ -29,6 +31,8 @@ const MorePosts: React.FC<MorePostsProps> = async ({ user }) => {
     },
   })
 
+  const currentUser = await getCurrentUser()
+
   return (
     <section
       className="mb-10"
@@ -39,8 +43,13 @@ const MorePosts: React.FC<MorePostsProps> = async ({ user }) => {
         <h3 className="text-xl font-bold">Ver más de {user.name}</h3>
         <Button
           variant='link'
+          asChild
         >
-          Ver todos →
+          <Link
+            href={`/${user.id}`}
+          >
+            Ver todos →
+          </Link>
         </Button>
       </div>
       <div
@@ -51,6 +60,7 @@ const MorePosts: React.FC<MorePostsProps> = async ({ user }) => {
             <PostCard
               key={post.id}
               post={post}
+              currentUser={currentUser}
             />
           ))
         }

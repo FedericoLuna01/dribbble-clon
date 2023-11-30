@@ -11,8 +11,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Textarea } from "./ui/textarea"
 import ImageUpload from "./image-upload"
-import { Post } from "@prisma/client"
+import { Category, Post } from "@prisma/client"
 import { useParams, useRouter } from "next/navigation"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 
 const formSchema = z.object({
   title: z.string()
@@ -29,13 +30,16 @@ const formSchema = z.object({
     .url({ message: 'Debe ser una URL válida' }),
   imageUrl: z.string()
     .min(1, { message: 'Se necesita una imagen' }),
+  categoryId: z.string()
+    .min(1, { message: 'Se necesita una categoría' }),
 })
 
 interface UploadFormProps {
   initialData: Post | null
+  categories: Category[]
 }
 
-const EditForm: React.FC<UploadFormProps> = ({ initialData }) => {
+const EditForm: React.FC<UploadFormProps> = ({ initialData, categories }) => {
   const router = useRouter()
   const params = useParams()
 
@@ -90,6 +94,35 @@ const EditForm: React.FC<UploadFormProps> = ({ initialData }) => {
                   {...field}
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="categoryId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Categoría</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="De que se trata tu proyecto?" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {
+                    categories.map(category => (
+                      <SelectItem
+                        key={category.id}
+                        value={category.id}
+                      >
+                        {category.name}
+                      </SelectItem>
+                    ))
+                  }
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

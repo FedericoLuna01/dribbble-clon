@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "./ui/textarea"
 import ImageUpload from "./image-upload"
 import { useRouter } from "next/navigation"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { Category } from "@prisma/client"
 
 const formSchema = z.object({
   title: z.string()
@@ -28,9 +30,15 @@ const formSchema = z.object({
     .url({ message: 'Debe ser una URL válida' }),
   imageUrl: z.string()
     .min(1, { message: 'Se necesita una imagen' }),
+  categoryId: z.string()
+    .min(1, { message: 'Se necesita una categoría' }),
 })
 
-const UploadForm = () => {
+interface UploadFormProps {
+  categories: Category[]
+}
+
+const UploadForm: React.FC<UploadFormProps> = ({ categories }) => {
   const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -39,6 +47,7 @@ const UploadForm = () => {
       description: "",
       web: "",
       repo: "",
+      categoryId: "",
     },
   })
 
@@ -86,6 +95,35 @@ const UploadForm = () => {
                   {...field}
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="categoryId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Categoría</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="De que se trata tu proyecto?" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {
+                    categories.map(category => (
+                      <SelectItem
+                        key={category.id}
+                        value={category.id}
+                      >
+                        {category.name}
+                      </SelectItem>
+                    ))
+                  }
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
